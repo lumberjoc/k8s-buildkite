@@ -1,0 +1,57 @@
+# buildkite-agent-deployment.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: buildkite-agent
+  namespace: hello-world
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: buildkite-agent
+  template:
+    metadata:
+      labels:
+        app: buildkite-agent
+    spec:
+      serviceAccountName: buildkite-agent
+      containers:
+      - name: buildkite-agent
+        image: buildkite/agent:latest
+        env:
+        - name: BUILDKITE_AGENT_TOKEN
+          valueFrom:
+            secretKeyRef:
+              name: buildkite-agent-token
+              key: token
+        - name: DOCKER_HUB_ACCESS_TOKEN
+          valueFrom:
+            secretKeyRef:
+              name: dockerhub-credentials
+              key: access-token
+        - name: BUILDKITE_UNCLAIM_CONTAINERS_VIA_API
+          value: "true"
+        - name: BUILDKITE_AGENT_META_DATA_CPU_LIMIT
+          value: "4"
+        - name: BUILDKITE_AGENT_META_DATA_MEMORY_LIMIT
+          value: "8Gi"
+        - name: BUILDKITE_AGENT_META_DATA_KUBERNETES
+          value: "true"
+        - name: BUILDKITE_AGENT_META_DATA_KUBERNETES_NAMESPACE
+          value: "hello-world"
+        - name: BUILDKITE_AGENT_META_DATA_KUBERNETES_POD_NAME
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.name
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: buildkite-agent
+  namespace: hello-world
+spec:
+  selector:
+    app: buildkite-agent
+  ports:
+  - port: 8000
+    targetPort: 8000

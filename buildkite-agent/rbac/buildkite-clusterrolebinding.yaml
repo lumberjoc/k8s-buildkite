@@ -1,0 +1,13 @@
+# buildkite-clusterrolebinding.yaml
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: buildkite-agent-rolebinding
+subjects:
+- kind: ServiceAccount
+  name: buildkite-agent
+  namespace: hello-world
+roleRef:
+  kind: ClusterRole
+  name: buildkite-agent-role
+  apiGroup: rbac.authorization.k8s.io

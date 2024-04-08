@@ -1,0 +1,19 @@
+# buildkite-agent-ingress.yaml
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: buildkite-agent-ingress
+  namespace: hello-world
+  annotations:
+    kubernetes.io/ingress.class: "nginx"
+spec:
+  rules:
+  - http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: buildkite-agent
+            port:
+              number: 8000

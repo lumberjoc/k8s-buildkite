@@ -1,0 +1,27 @@
+# pipeline.yml
+steps:
+  - label: "Authenticate with DockerHub"
+    commands:
+      - docker login -u lumberjoc -p ${DOCKER_HUB_ACCESS_TOKEN}
+
+  - label: "Build and Push Docker Image"
+    commands:
+      - docker build -t lumberjoc/hello-world:$BUILDKITE_BUILD_NUMBER .
+      - docker push lumberjoc/hello-world:$BUILDKITE_BUILD_NUMBER
+
+  - wait
+
+  - label: "Deploy to Kubernetes"
+    commands:
+      - kubectl set image deployment/hello-world hello-world=lumberjoc/hello-world:$BUILDKITE_BUILD_NUMBER -n hello-world
+    agents:
+      queue: "kubernetes"
+
+agent-queues:
+  - "kubernetes"
+
+queue-configuration:
+  kubernetes:
+    cluster: "minikube"
+    namespace: "hello-world"
+    agent-service-account: "buildkite-agent"
