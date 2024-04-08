@@ -6,11 +6,20 @@ How to guide for setting up a simple Buildkite pipeline on your Kubernetes clust
 hello-world-app/
 ├── .buildkite
 │   └── pipeline.yml
+├── buildkite-agent
+│   ├── buildkite-clusterrole.yaml
+│   ├── buildkite-clusterrolebinding.yaml
+│   └── buildkite-serviceaccount.yaml
 ├── Dockerfile
 ├── deployment.yaml
 ├── main.go
 └── service.yaml
 ```
+The buildkite-agent directory contains the RBAC configuration files for the Buildkite agent:
+- `buildkite-clusterrole.yaml`: This file defines a ClusterRole with the necessary permissions for the Buildkite agent.
+- `buildkite-clusterrolebinding.yaml`: This file creates a ClusterRoleBinding to bind the ClusterRole to the Buildkite agent's ServiceAccount.
+- `buildkite-serviceaccount.yaml`: This file creates the ServiceAccount for the Buildkite agent.
+
 - `hello-world-app/`: This is the root directory for your "Hello World" application.
 - `.buildkite/`: This directory contains the Buildkite pipeline configuration.
   - `pipeline.yml`: This file defines the steps in your CI/CD pipeline, such as building the Docker image, pushing it to a registry, and deploying it to Kubernetes.
@@ -154,6 +163,26 @@ You'll need to create a Kubernetes secret for the Buildkite agent token:
 kubectl create secret generic buildkite-agent-token --from-literal=token=YOUR_BUILDKITE_AGENT_TOKEN -n hello-world
 ```
 Replace YOUR_BUILDKITE_AGENT_TOKEN with the actual token from your Buildkite account.
+
+Before deploying the Buildkite agent, you need to create the "kubernetes" agent queue in your Buildkite account. This can be done through the Buildkite web interface or using the Buildkite CLI. If you don't do this your agent will not connect. 
+
+Post-Deploy Failed Connection Logs:
+```
+| 2024-04-08 17:36:46 INFO   Registering agent with Buildkite...
+│ 2024-04-08 17:36:46 WARN   Failed to find unique machine-id: machineid: machineid: open /etc/machine-id: no such file or directory
+│ 2024-04-08 17:36:46 WARN   POST https://agent.buildkite.com/v3/register: 400 Bad Request: Queue is required when registering agents to a cluster (Attempt 1/30 Retrying
+```
+
+Post-Deploy Successful Connection Logs:
+```
+| 2024-04-08 17:36:46 INFO   Registering agent with Buildkite...
+| 2024-04-08 17:38:07 INFO   Successfully registered agent "buildkite-agent-687bb4f685-kqx7b-1" with tags [queue=kubernetes]                                             
+│ 2024-04-08 17:38:07 INFO   Starting 1 Agent(s)                                                                                                                         
+│ 2024-04-08 17:38:07 INFO   You can press Ctrl-C to stop the agents                                                                                                      
+│ 2024-04-08 17:38:07 INFO   buildkite-agent-687bb4f685-kqx7b-1 Connecting to Buildkite...                                                                                
+│ 2024-04-08 17:38:07 INFO   buildkite-agent-687bb4f685-kqx7b-1 Waiting for work...
+```
+
 
 Apply the deployment and service:
 ```
