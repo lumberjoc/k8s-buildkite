@@ -56,7 +56,7 @@ RBAC (Role-Based Access Control) is a crucial aspect of Kubernetes security. It 
 
 First, create a ServiceAccount for the Buildkite agent:
 ```
-# buildkite-serviceaccount.yaml
+# buildkite serviceaccount.yaml
 apiVersion: v1
 kind: ServiceAccount
 metadata:
@@ -71,7 +71,7 @@ kubectl apply -f buildkite-serviceaccount.yaml -n hello-world
 
 Next, create a ClusterRole that grants the necessary permissions for the Buildkite agent:
 ```
-# buildkite-clusterrole.yaml
+# buildkite clusterrole.yaml
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRole
 metadata:
@@ -84,7 +84,7 @@ rules:
 
 Finally, create a ClusterRoleBinding to bind the ClusterRole to the ServiceAccount:
 ```
-# buildkite-clusterrolebinding.yaml
+# buildkite clusterrolebinding.yaml
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRoleBinding
 metadata:
@@ -157,7 +157,7 @@ spec:
 ```
 
 ```
-#buildkite-service.yaml
+# buildkite-service.yaml
 apiVersion: v1
 kind: Service
 metadata:
