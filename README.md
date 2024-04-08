@@ -1,6 +1,25 @@
 # k8s-buildkite
 How to guide for setting up a simple Buildkite pipeline on your Kubernetes cluster. I went through a few different tutorials explaining how to setup Buildkite, but was unable to find an adequate tutorial on how to setup a pipeline on a Kubernetes cluster. As a result, I've created this straight forward tutorial on how to setup a simple pipeline. Hope you enjoy!
 
+## File & Directory Breakdown
+```
+hello-world-app/
+├── .buildkite
+│   └── pipeline.yml
+├── Dockerfile
+├── deployment.yaml
+├── main.go
+└── service.yaml
+```
+- `hello-world-app/`: This is the root directory for your "Hello World" application.
+- `.buildkite/`: This directory contains the Buildkite pipeline configuration.
+  - `pipeline.yml`: This file defines the steps in your CI/CD pipeline, such as building the Docker image, pushing it to a registry, and deploying it to Kubernetes.
+- `Dockerfile`: This file contains the instructions for building the Docker image for your Go application.
+- `deployment.yaml`: This Kubernetes manifest file defines the deployment for your "Hello World" application, specifying the number of replicas, container image, and other configurations.
+- `service.yaml`: This Kubernetes manifest file defines a service to expose your "Hello World" application deployment to other pods or external traffic.
+- `main.go`: This is the source code file for your simple "Hello World" Go application.
+
+
 ## Step 1: Set up Kubernetes Cluster
 
 We'll be using minikube for this tutorial since it's a lightweight and easy-to-use Kubernetes cluster. You can install minikube by following the instructions for your operating system from the official website: https://minikube.sigs.k8s.io/docs/start/
