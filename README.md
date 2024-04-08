@@ -1,37 +1,32 @@
 # k8s-buildkite
-How to guide for setting up a simple Buildkite pipeline on your Kubernetes cluster. I went through a few different tutorials explaining how to setup Buildkite, but was unable to find an adequate tutorial on how to setup a pipeline on a Kubernetes cluster. As a result, I've created this straight forward tutorial on how to setup a simple pipeline. Hope you enjoy!
+How-To guide for setting up a Buildkite agent in your Kubernetes cluster. I went through a few different tutorials explaining how to setup Buildkite, but was unable to find a tutorial I liked on how to setup an agent on a Kubernetes cluster. As a result, I've created this straight forward tutorial on how to setup a Buildkite agent. 
+
+Disclaimer: This is not production ready, but it should be good exercise to get you familiarized with Buildkite, k8s networking, rbac, and more! Hope you enjoy!
 
 ## File & Directory Breakdown
 ```
 k8s-buildkite
 ├── README.md
-├── buildkite-agent
-│   ├── deploy
-│   │   ├── 0-deployment.yaml
-│   │   ├── 1-service.yaml
-│   │   └── 2-ingress.yaml
-│   └── rbac
-│       ├── 0-clusterrole.yaml
-│       ├── 1-clusterrolebinding.yaml
-│       └── 2-serviceaccount.yaml
-└── hello-world-app
-    ├── 0-service.yaml
-    ├── 1-deployment.yaml
-    ├── Dockerfile
-    └── main.go
+└── buildkite-agent
+    ├── deploy
+    │   ├── 0-deployment.yaml
+    │   ├── 1-service.yaml
+    │   ├── 2-ingress.yaml
+    └── rbac
+        ├── 0-clusterrole.yaml
+        ├── 1-clusterrolebinding.yaml
+        └── 2-serviceaccount.yaml
 ```
-The `buildkite-agent/rbac` directory contains the RBAC configuration files for the Buildkite agent:
-- `0-clusterrole.yaml`: This file defines a ClusterRole with the necessary permissions for the Buildkite agent.
-- `1-clusterrolebinding.yaml`: This file creates a ClusterRoleBinding to bind the ClusterRole to the Buildkite agent's ServiceAccount.
-- `2-serviceaccount.yaml`: This file creates the ServiceAccount for the Buildkite agent.
-
-- `hello-world-app/`: This is the root directory for your "Hello World" application.
-- `.buildkite/`: This directory contains the Buildkite pipeline configuration.
-  - `pipeline.yml`: This file defines the steps in your CI/CD pipeline, such as building the Docker image, pushing it to a registry, and deploying it to Kubernetes.
-- `Dockerfile`: This file contains the instructions for building the Docker image for your Go application.
-- `hello-world-app/1-deployment.yaml`: This Kubernetes manifest file defines the deployment for your "Hello World" application, specifying the number of replicas, container image, and other configurations.
-- `hello-world-app/0-service.yaml`: This Kubernetes manifest file defines a service to expose your "Hello World" application deployment to other pods or external traffic.
-- `main.go`: This is the source code file for your simple "Hello World" Go application.
+- `buildkite-agent/`: This directory contains the configuration files for the Buildkite agent.
+  - `deploy/`: This directory contains the Kubernetes deployment files for the Buildkite agent.
+    - `0-deployment.yaml`: This file defines the Kubernetes Deployment for the Buildkite agent, specifying the container image, environment variables, and resource requests/limits.
+    - `1-service.yaml`: This file defines the Kubernetes Service to expose the Buildkite agent.
+    - `2-ingress.yaml`: This file defines the Kubernetes Ingress to expose the Buildkite agent to external traffic.
+    - [Coming Soon]`3-hpa.yaml`: This file defines the Horizontal Pod Autoscaler (HPA) for the Buildkite agent, which automatically scales the number of agent pods based on CPU utilization.
+  - `rbac/`: This directory contains the RBAC configuration files for the Buildkite agent.
+    - `0-clusterrole.yaml`: This file defines a ClusterRole with the necessary permissions for the Buildkite agent.
+    - `1-clusterrolebinding.yaml`: This file creates a ClusterRoleBinding to bind the ClusterRole to the Buildkite agent's ServiceAccount.
+    - `2-serviceaccount.yaml`: This file creates the ServiceAccount for the Buildkite agent.
 
 
 ## Step 1: Set up Kubernetes Cluster
@@ -47,7 +42,7 @@ minikube start
 
 Namespaces in Kubernetes provide a way to logically partition resources within the same cluster. Let's create a namespace for our "hello-world" application:
 ```
-kubectl create namespace hello-world
+kubectl create namespace buildkite
 ```
 
 ## Step 3: Configure RBAC
@@ -61,17 +56,17 @@ apiVersion: v1
 kind: ServiceAccount
 metadata:
   name: buildkite-agent
-  namespace: hello-world
+  namespace: buildkite
 ```
 
 Apply the ServiceAccount:
 ```
-kubectl apply -f buildkite-serviceaccount.yaml -n hello-world
+kubectl apply -f 2-serviceaccount.yaml -n buildkite
 ```
 
 Next, create a ClusterRole that grants the necessary permissions for the Buildkite agent:
 ```
-# buildkite clusterrole.yaml
+# buildkite 0-clusterrole.yaml
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRole
 metadata:
@@ -82,9 +77,14 @@ rules:
   verbs: ["*"]
 ```
 
+Apply the ClusterRole:
+```
+kubectl apply -f 2-clusterrole.yaml -n buildkite
+```
+
 Finally, create a ClusterRoleBinding to bind the ClusterRole to the ServiceAccount:
 ```
-# buildkite clusterrolebinding.yaml
+# buildkite 1-clusterrolebinding.yaml
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRoleBinding
 metadata:
@@ -92,7 +92,7 @@ metadata:
 subjects:
 - kind: ServiceAccount
   name: buildkite-agent
-  namespace: hello-world
+  namespace: buildkite
 roleRef:
   kind: ClusterRole
   name: buildkite-agent-role
@@ -101,7 +101,7 @@ roleRef:
 
 Apply the ClusterRoleBinding:
 ```
-kubectl apply -f buildkite-clusterrolebinding.yaml
+kubectl apply -f 1-clusterrolebinding.yaml
 ```
 
 ## Step 4: Set up Buildkite Agent
@@ -114,7 +114,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: buildkite-agent
-  namespace: hello-world
+  namespace: buildkite
 spec:
   replicas: 1
   selector:
@@ -149,7 +149,7 @@ spec:
         - name: BUILDKITE_AGENT_META_DATA_KUBERNETES
           value: "true"
         - name: BUILDKITE_AGENT_META_DATA_KUBERNETES_NAMESPACE
-          value: "hello-world"
+          value: "buildkite"
         - name: BUILDKITE_AGENT_META_DATA_KUBERNETES_POD_NAME
           valueFrom:
             fieldRef:
@@ -162,7 +162,7 @@ apiVersion: v1
 kind: Service
 metadata:
   name: buildkite-agent
-  namespace: hello-world
+  namespace: buildkite
 spec:
   selector:
     app: buildkite-agent
@@ -174,13 +174,13 @@ spec:
 Before applying, you'll need to create a Kubernetes secret for the Buildkite agent token and your Dockerhub access token:
 1) Agent-Token
 ```
-kubectl create secret generic buildkite-agent-token --from-literal=token=YOUR_BUILDKITE_AGENT_TOKEN -n hello-world
+kubectl create secret generic buildkite-agent-token --from-literal=token=YOUR_BUILDKITE_AGENT_TOKEN -n buildkite
 ```
 Replace YOUR_BUILDKITE_AGENT_TOKEN with the actual token from your Buildkite account.
 
 2) Dockerhub-Token
 ```
-kubectl create secret generic dockerhub-credentials --from-literal=access-token=YOUR_DOCKERHUB_ACCESS_TOKEN -n hello-world
+kubectl create secret generic dockerhub-credentials --from-literal=access-token=YOUR_DOCKERHUB_ACCESS_TOKEN -n buildkite
 ```
 Replace YOUR_DOCKERHUB_ACCESS_TOKEN with the actual token from your Buildkite account.
 
@@ -189,10 +189,104 @@ Before deploying the Buildkite agent, you need to create the "kubernetes" agent-
 
 Apply the deployment and service:
 ```
-kubectl apply -f buildkite-agent-deployment.yaml -n hello-world
+kubectl apply -f 0-deployment.yaml -n buildkite
 ```
 
-Step 5: Set up Ingress/Egress
+## [COMING SOON: Skip for now] Step 5: Create a Horizontal Pod Autoscaler (HPA)
+
+If you anticipate varying workloads or want to automatically scale the number of agent pods based on resource utilization, implementing an HPA is a good idea.
+
+Create a new file `3-hpa.yaml` in the `k8s-buildkite/buildkite-agent/deploy` directory:
+```
+# k8s-buildkite/buildkite-agent/deploy/3-hpa.yaml
+apiVersion: autoscaling/v2beta1
+kind: HorizontalPodAutoscaler
+metadata:
+  name: buildkite-agent-hpa
+  namespace: buildkite
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: buildkite-agent
+  minReplicas: 1
+  maxReplicas: 5
+  metrics:
+  - type: Resource
+    resource:
+      name: cpu
+      targetAverageUtilization: 50
+```
+
+This HPA configuration will automatically scale the number of Buildkite agent pods between 1 and 5, based on the average CPU utilization. When the average CPU utilization reaches 50%, the HPA will start scaling up the number of pods.
+
+Apply the HPA:
+```
+kubectl apply -f k8s-buildkite/buildkite-agent/deploy/3-hpa.yaml
+```
+
+Update the `0-deployment.yaml` in the `k8s-buildkite/buildkite-agent/deploy` directory to include resource requests and limits for the Buildkite agent pods:
+```
+# k8s-buildkite/buildkite-agent/deploy/0-deployment.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: buildkite-agent
+  namespace: buildkite
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: buildkite-agent
+  template:
+    metadata:
+      labels:
+        app: buildkite-agent
+    spec:
+      serviceAccountName: buildkite-agent
+      containers:
+      - name: buildkite-agent
+        image: buildkite/agent:latest
+        resources:
+          requests:
+            cpu: 100m
+            memory: 128Mi
+          limits:
+            cpu: 500m
+            memory: 512Mi
+        env:
+        - name: BUILDKITE_AGENT_TOKEN
+          valueFrom:
+            secretKeyRef:
+              name: buildkite-agent-token
+              key: token
+        - name: DOCKER_HUB_ACCESS_TOKEN
+          valueFrom:
+            secretKeyRef:
+              name: dockerhub-credentials
+              key: access-token
+        - name: BUILDKITE_UNCLAIM_CONTAINERS_VIA_API
+          value: "true"
+        - name: BUILDKITE_AGENT_META_DATA_CPU_LIMIT
+          value: "4"
+        - name: BUILDKITE_AGENT_META_DATA_MEMORY_LIMIT
+          value: "8Gi"
+        - name: BUILDKITE_AGENT_META_DATA_KUBERNETES
+          value: "true"
+        - name: BUILDKITE_AGENT_META_DATA_KUBERNETES_NAMESPACE
+          value: "buildkite"
+        - name: BUILDKITE_AGENT_META_DATA_KUBERNETES_POD_NAME
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.name
+```
+
+Apply the updated deployment:
+```
+kubectl apply -f k8s-buildkite/buildkite-agent/deploy/0-deployment.yaml
+```
+
+## Step 6: Set up Ingress/Egress
 
 Since the Buildkite agent needs to communicate with the Buildkite service, we need to configure networking appropriately. In this case, we'll use an Ingress resource to expose the Buildkite agent service to the internet:
 ```
@@ -201,7 +295,7 @@ apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
   name: buildkite-agent-ingress
-  namespace: hello-world
+  namespace: buildkite
   annotations:
     kubernetes.io/ingress.class: "nginx"
 spec:
@@ -219,7 +313,7 @@ spec:
 
 Apply the Ingress:
 ```
-kubectl apply -f buildkite-agent-ingress.yaml -n hello-world
+kubectl apply -f buildkite-agent-ingress.yaml -n buildkite
 ```
 
 Post-Deploy Failed Connection Logs:
@@ -239,173 +333,7 @@ Post-Deploy Successful Connection Logs:
 │ 2024-04-08 17:38:07 INFO   buildkite-agent-687bb4f685-kqx7b-1 Waiting for work...
 ```
 
+## Create a pipeline and run a job
 
-## Step 6: Set up "Hello World" Application
+Your agent should now be connected to the "kubernetes" queue in Buildkite. Feel free to start making pipelines and building until your hearts content. I will be updating this repo with HPA mechanisms as well as a simple docker build/deploy pipeline in the future. Feel free to checkout Buildkites [Getting Started](https://buildkite.com/docs/tutorials/getting-started) guide to gain more familiarity with the tool. Thanks for reading!
 
-Now, let's create a simple "Hello World" application that we'll deploy to Kubernetes and set up a CI/CD pipeline for.
-
-Create a new directory for your application:
-```
-mkdir hello-world-app
-cd hello-world-app
-```
-
-Create a simple main.go file:
-```
-// main.go
-package main
-
-import (
-    "fmt"
-    "net/http"
-)
-
-func main() {
-    http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
-        fmt.Fprintf(w, "Hello, World!")
-    })
-
-    fmt.Println("Server listening on port 8080")
-    http.ListenAndServe(":8080", nil)
-}
-```
-
-Create a Dockerfile to build the Go application:
-```
-# Dockerfile
-FROM golang:1.19-alpine
-
-WORKDIR /app
-
-COPY . .
-
-RUN go build -o hello-world .
-
-EXPOSE 8080
-
-CMD ["./hello-world"]
-```
-
-Create a deployment.yaml file to deploy the application to Kubernetes:
-```
-# deployment.yaml
-apiVersion: apps/v1
-kind: Deployment
-metadata:
-  name: hello-world
-  namespace: hello-world
-spec:
-  replicas: 3
-  selector:
-    matchLabels:
-      app: hello-world
-  template:
-    metadata:
-      labels:
-        app: hello-world
-    spec:
-      containers:
-      - name: hello-world
-        image: hello-world:latest
-        ports:
-        - containerPort: 8080
-```
-
-Create a service.yaml file to expose the deployment:
-```
-# service.yaml
-apiVersion: v1
-kind: Service
-metadata:
-  name: hello-world
-  namespace: hello-world
-spec:
-  selector:
-    app: hello-world
-  ports:
-  - port: 80
-    targetPort: 8080
-```
-
-## Step 7: Set up CI/CD Pipeline
-
-Now, let's set up a CI/CD pipeline using Buildkite to build and deploy our "Hello World" application.
-
-Create a .buildkite directory in your project:
-```
-mkdir .buildkite
-```
-
-Inside the .buildkite directory, create a pipeline.yml file with the following content:
-```
-# pipeline.yml
-steps:
-  - label: "Build and Push Docker Image"
-    commands:
-      - docker build -t hello-world:$BUILDKITE_BUILD_NUMBER .
-      - docker push hello-world:$BUILDKITE_BUILD_NUMBER
-
-  - wait
-
-  - label: "Deploy to Kubernetes"
-    commands:
-      - kubectl set image deployment/hello-world hello-world=hello-world:$BUILDKITE_BUILD_NUMBER -n hello-world
-    agents:
-      queue: "kubernetes"
-
-# Configure the Kubernetes queue
-agent-queues:
-  - "kubernetes"
-
-# Configure the queue settings
-queue-configuration:
-  kubernetes:
-    cluster: "minikube"
-    namespace: "hello-world"
-    agent-service-account: "buildkite-agent"
-```
-
-This pipeline defines two steps:
-
-1. Build and Push Docker Image: This step builds a Docker image for your "Hello World" application and pushes it to a Docker registry (you'll need to configure a registry and replace hello-world with your registry URL).
-2. Deploy to Kubernetes: This step updates the hello-world deployment in the hello-world namespace with the new Docker image built in the previous step.
-
-The agents section specifies that the "Deploy to Kubernetes" step should be run by an agent in the "kubernetes" queue.
-
-The agent-queues section defines the "kubernetes" queue, which will be used by the Buildkite agents running in your Kubernetes cluster.
-
-The queue-configuration section configures the "kubernetes" queue to use the minikube cluster, the hello-world namespace, and the buildkite-agent ServiceAccount.
-
-
-## Step 8: Trigger the Pipeline
-
-Now that you have the pipeline defined, you can trigger it from the Buildkite web interface or using the Buildkite CLI.
-
-After triggering the pipeline, you should see the steps executing in the Buildkite web interface. Once the pipeline completes successfully, your "Hello World" application will be deployed to the hello-world namespace in your Kubernetes cluster.
-
-You can verify the deployment by running:
-```
-kubectl get pods -n hello-world
-```
-
-You should see three pods running your "Hello World" application.
-
-To access the application, you can use the minikube service command:
-```
-minikube service hello-world -n hello-world
-```
-
-This will open a browser window or provide you with the URL to access your "Hello World" application.
-
-And that's it! You've successfully set up a simple CI/CD pipeline for a "Hello World" application using Kubernetes and Buildkite.
-
-This tutorial covered several key concepts, including:
-- Setting up a Kubernetes cluster
-- Creating namespaces and configuring RBAC
-- Deploying and configuring the Buildkite agent
-- Setting up networking (Ingress)
-- Creating a simple Go application
-- Defining a CI/CD pipeline with Buildkite
-- Triggering the pipeline and verifying the deployment
-
-Remember, this is a basic example, and in a production environment, you'd want to consider additional aspects like persistent storage, more robust networking configurations, monitoring, and more advanced pipeline steps (e.g., running tests, static code analysis, etc.).

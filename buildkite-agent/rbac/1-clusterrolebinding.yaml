@@ -6,7 +6,7 @@ metadata:
 subjects:
 - kind: ServiceAccount
   name: buildkite-agent
-  namespace: hello-world
+  namespace: buildkite
 roleRef:
   kind: ClusterRole
   name: buildkite-agent-role
