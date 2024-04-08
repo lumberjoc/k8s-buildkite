@@ -23,11 +23,11 @@ spec:
             secretKeyRef:
               name: buildkite-agent-token
               key: token
-        - name: DOCKER_HUB_ACCESS_TOKEN
-          valueFrom:
-            secretKeyRef:
-              name: dockerhub-credentials
-              key: access-token
+        # - name: DOCKER_HUB_ACCESS_TOKEN
+        #   valueFrom:
+        #     secretKeyRef:
+        #       name: dockerhub-credentials
+        #       key: access-token
         - name: BUILDKITE_UNCLAIM_CONTAINERS_VIA_API
           value: "true"
         - name: BUILDKITE_AGENT_META_DATA_CPU_LIMIT

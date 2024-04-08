@@ -107,7 +107,7 @@ kubectl apply -f 2-clusterrolebinding.yaml
 ## Step 4: Set up Buildkite Agent
 
 We'll be using Buildkite's agent to run our pipelines. You can sign up for a Buildkite account and follow their instructions to set up the agent token.
-Once you have the Buildkite agent token, you'll need to create a Kubernetes deployment that uses the agent-token and a service (don't apply immediately after creating files):
+Once you have the Buildkite agent token, you'll need to create a Kubernetes deployment that uses the agent-token and a service (don't apply until after creating secret):
 ```
 # buildkite-agent-deployment.yaml
 apiVersion: apps/v1
@@ -178,12 +178,13 @@ kubectl create secret generic buildkite-agent-token --from-literal=token=YOUR_BU
 ```
 Replace YOUR_BUILDKITE_AGENT_TOKEN with the actual token from your Buildkite account.
 
-2) [SKIP] Dockerhub-Token
+[SKIP START] 
+2) Dockerhub-Token
 ```
 kubectl create secret generic dockerhub-credentials --from-literal=access-token=YOUR_DOCKERHUB_ACCESS_TOKEN -n buildkite
 ```
 Replace YOUR_DOCKERHUB_ACCESS_TOKEN with the actual token from your Buildkite account.
-
+[SKIP END]
 
 Before deploying the Buildkite agent, you need to create the "kubernetes" agent-queue in your Buildkite account. This can be done through the Buildkite web interface or using the Buildkite CLI. If you don't do this your agent will not connect. 
 
