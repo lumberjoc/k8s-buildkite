@@ -14,7 +14,7 @@ k8s-buildkite
 │       ├── 0-clusterrole.yaml
 │       ├── 1-clusterrolebinding.yaml
 │       └── 2-serviceaccount.yaml
-└── example-app
+└── hello-world-app
     ├── 0-service.yaml
     ├── 1-deployment.yaml
     ├── Dockerfile
@@ -25,12 +25,12 @@ The `buildkite-agent/rbac` directory contains the RBAC configuration files for t
 - `1-clusterrolebinding.yaml`: This file creates a ClusterRoleBinding to bind the ClusterRole to the Buildkite agent's ServiceAccount.
 - `2-serviceaccount.yaml`: This file creates the ServiceAccount for the Buildkite agent.
 
-- `example-app/`: This is the root directory for your "Hello World" application.
+- `hello-world-app/`: This is the root directory for your "Hello World" application.
 - `.buildkite/`: This directory contains the Buildkite pipeline configuration.
   - `pipeline.yml`: This file defines the steps in your CI/CD pipeline, such as building the Docker image, pushing it to a registry, and deploying it to Kubernetes.
 - `Dockerfile`: This file contains the instructions for building the Docker image for your Go application.
-- `example-app/1-deployment.yaml`: This Kubernetes manifest file defines the deployment for your "Hello World" application, specifying the number of replicas, container image, and other configurations.
-- `example-app/0-service.yaml`: This Kubernetes manifest file defines a service to expose your "Hello World" application deployment to other pods or external traffic.
+- `hello-world-app/1-deployment.yaml`: This Kubernetes manifest file defines the deployment for your "Hello World" application, specifying the number of replicas, container image, and other configurations.
+- `hello-world-app/0-service.yaml`: This Kubernetes manifest file defines a service to expose your "Hello World" application deployment to other pods or external traffic.
 - `main.go`: This is the source code file for your simple "Hello World" Go application.
 
 
