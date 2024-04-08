@@ -35,7 +35,7 @@ minikube start
 
 Namespaces in Kubernetes provide a way to logically partition resources within the same cluster. Let's create a namespace for our "hello-world" application:
 ```
-kubectl create namespace hello-world
+kubectl create namespace buildkite
 ```
 
 ## Step 3: Configure RBAC
@@ -49,12 +49,12 @@ apiVersion: v1
 kind: ServiceAccount
 metadata:
   name: buildkite-agent
-  namespace: hello-world
+  namespace: buildkite
 ```
 
 Apply the ServiceAccount:
 ```
-kubectl apply -f buildkite-serviceaccount.yaml -n hello-world
+kubectl apply -f buildkite-serviceaccount.yaml -n buildkite
 ```
 
 Next, create a ClusterRole that grants the necessary permissions for the Buildkite agent:
@@ -80,7 +80,7 @@ metadata:
 subjects:
 - kind: ServiceAccount
   name: buildkite-agent
-  namespace: hello-world
+  namespace: buildkite
 roleRef:
   kind: ClusterRole
   name: buildkite-agent-role
@@ -102,7 +102,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: buildkite-agent
-  namespace: hello-world
+  namespace: buildkite
 spec:
   replicas: 1
   selector:
@@ -137,7 +137,7 @@ spec:
         - name: BUILDKITE_AGENT_META_DATA_KUBERNETES
           value: "true"
         - name: BUILDKITE_AGENT_META_DATA_KUBERNETES_NAMESPACE
-          value: "hello-world"
+          value: "buildkite"
         - name: BUILDKITE_AGENT_META_DATA_KUBERNETES_POD_NAME
           valueFrom:
             fieldRef:
@@ -150,7 +150,7 @@ apiVersion: v1
 kind: Service
 metadata:
   name: buildkite-agent
-  namespace: hello-world
+  namespace: buildkite
 spec:
   selector:
     app: buildkite-agent
@@ -162,13 +162,13 @@ spec:
 Before applying, you'll need to create a Kubernetes secret for the Buildkite agent token and your Dockerhub access token:
 1) Agent-Token
 ```
-kubectl create secret generic buildkite-agent-token --from-literal=token=YOUR_BUILDKITE_AGENT_TOKEN -n hello-world
+kubectl create secret generic buildkite-agent-token --from-literal=token=YOUR_BUILDKITE_AGENT_TOKEN -n buildkite
 ```
 Replace YOUR_BUILDKITE_AGENT_TOKEN with the actual token from your Buildkite account.
 
 2) Dockerhub-Token
 ```
-kubectl create secret generic dockerhub-credentials --from-literal=access-token=YOUR_DOCKERHUB_ACCESS_TOKEN -n hello-world
+kubectl create secret generic dockerhub-credentials --from-literal=access-token=YOUR_DOCKERHUB_ACCESS_TOKEN -n buildkite
 ```
 Replace YOUR_DOCKERHUB_ACCESS_TOKEN with the actual token from your Buildkite account.
 
@@ -177,7 +177,7 @@ Before deploying the Buildkite agent, you need to create the "kubernetes" agent-
 
 Apply the deployment and service:
 ```
-kubectl apply -f buildkite-agent-deployment.yaml -n hello-world
+kubectl apply -f buildkite-agent-deployment.yaml -n buildkite
 ```
 
 ## Step 5: Create a Horizontal Pod Autoscaler (HPA)
@@ -191,7 +191,7 @@ apiVersion: autoscaling/v2beta1
 kind: HorizontalPodAutoscaler
 metadata:
   name: buildkite-agent-hpa
-  namespace: hello-world
+  namespace: buildkite
 spec:
   scaleTargetRef:
     apiVersion: apps/v1
@@ -220,7 +220,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: buildkite-agent
-  namespace: hello-world
+  namespace: buildkite
 spec:
   replicas: 1
   selector:
@@ -262,7 +262,7 @@ spec:
         - name: BUILDKITE_AGENT_META_DATA_KUBERNETES
           value: "true"
         - name: BUILDKITE_AGENT_META_DATA_KUBERNETES_NAMESPACE
-          value: "hello-world"
+          value: "buildkite"
         - name: BUILDKITE_AGENT_META_DATA_KUBERNETES_POD_NAME
           valueFrom:
             fieldRef:
@@ -283,7 +283,7 @@ apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
   name: buildkite-agent-ingress
-  namespace: hello-world
+  namespace: buildkite
   annotations:
     kubernetes.io/ingress.class: "nginx"
 spec:
@@ -301,7 +301,7 @@ spec:
 
 Apply the Ingress:
 ```
-kubectl apply -f buildkite-agent-ingress.yaml -n hello-world
+kubectl apply -f buildkite-agent-ingress.yaml -n buildkite
 ```
 
 Post-Deploy Failed Connection Logs:
