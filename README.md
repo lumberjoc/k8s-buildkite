@@ -13,9 +13,9 @@ k8s-buildkite
     │   ├── 1-service.yaml
     │   ├── 2-ingress.yaml
     └── rbac
-        ├── 0-clusterrole.yaml
-        ├── 1-clusterrolebinding.yaml
-        └── 2-serviceaccount.yaml
+        ├── 0-serviceaccount.yaml
+        ├── 1-clusterrole.yaml
+        └── 2-clusterrolebinding.yaml
 ```
 - `buildkite-agent/`: This directory contains the configuration files for the Buildkite agent.
   - `deploy/`: This directory contains the Kubernetes deployment files for the Buildkite agent.
@@ -24,9 +24,9 @@ k8s-buildkite
     - `2-ingress.yaml`: This file defines the Kubernetes Ingress to expose the Buildkite agent to external traffic.
     - [Coming Soon]`3-hpa.yaml`: This file defines the Horizontal Pod Autoscaler (HPA) for the Buildkite agent, which automatically scales the number of agent pods based on CPU utilization.
   - `rbac/`: This directory contains the RBAC configuration files for the Buildkite agent.
-    - `0-clusterrole.yaml`: This file defines a ClusterRole with the necessary permissions for the Buildkite agent.
-    - `1-clusterrolebinding.yaml`: This file creates a ClusterRoleBinding to bind the ClusterRole to the Buildkite agent's ServiceAccount.
-    - `2-serviceaccount.yaml`: This file creates the ServiceAccount for the Buildkite agent.
+    - `0-serviceaccount.yaml`: This file creates the ServiceAccount for the Buildkite agent.
+    - `1-clusterrole.yaml`: This file defines a ClusterRole with the necessary permissions for the Buildkite agent.
+    - `2-clusterrolebinding.yaml`:  This file creates a ClusterRoleBinding to bind the ClusterRole to the Buildkite agent's ServiceAccount.
 
 
 ## Step 1: Set up Kubernetes Cluster
