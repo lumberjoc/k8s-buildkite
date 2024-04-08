@@ -1,7 +1,7 @@
 # k8s-buildkite
 How-To guide for setting up a Buildkite agent in your Kubernetes cluster. I went through a few different tutorials explaining how to setup Buildkite, but was unable to find a tutorial I liked on how to setup an agent on a Kubernetes cluster. As a result, I've created this straight forward tutorial on how to setup a Buildkite agent. 
 
-Disclaimer: This is not production ready, but it should be good exercise to get you familiarized with Buildkite, k8s networking, rbac, and scaling. Hope you enjoy!
+Disclaimer: This is not production ready, but it should be good exercise to get you familiarized with Buildkite, k8s networking, rbac, and more! Hope you enjoy!
 
 ## File & Directory Breakdown
 ```
@@ -12,7 +12,6 @@ k8s-buildkite
     │   ├── 0-deployment.yaml
     │   ├── 1-service.yaml
     │   ├── 2-ingress.yaml
-    │   └── 3-hpa.yaml
     └── rbac
         ├── 0-clusterrole.yaml
         ├── 1-clusterrolebinding.yaml
@@ -23,7 +22,7 @@ k8s-buildkite
     - `0-deployment.yaml`: This file defines the Kubernetes Deployment for the Buildkite agent, specifying the container image, environment variables, and resource requests/limits.
     - `1-service.yaml`: This file defines the Kubernetes Service to expose the Buildkite agent.
     - `2-ingress.yaml`: This file defines the Kubernetes Ingress to expose the Buildkite agent to external traffic.
-    - `3-hpa.yaml`: This file defines the Horizontal Pod Autoscaler (HPA) for the Buildkite agent, which automatically scales the number of agent pods based on CPU utilization.
+    - [Coming Soon]`3-hpa.yaml`: This file defines the Horizontal Pod Autoscaler (HPA) for the Buildkite agent, which automatically scales the number of agent pods based on CPU utilization.
   - `rbac/`: This directory contains the RBAC configuration files for the Buildkite agent.
     - `0-clusterrole.yaml`: This file defines a ClusterRole with the necessary permissions for the Buildkite agent.
     - `1-clusterrolebinding.yaml`: This file creates a ClusterRoleBinding to bind the ClusterRole to the Buildkite agent's ServiceAccount.
