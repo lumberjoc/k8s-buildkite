@@ -6,11 +6,20 @@ How to guide for setting up a simple Buildkite pipeline on your Kubernetes clust
 hello-world-app/
 ├── .buildkite
 │   └── pipeline.yml
+├── buildkite-agent
+│   ├── buildkite-clusterrole.yaml
+│   ├── buildkite-clusterrolebinding.yaml
+│   └── buildkite-serviceaccount.yaml
 ├── Dockerfile
 ├── deployment.yaml
 ├── main.go
 └── service.yaml
 ```
+The buildkite-agent directory contains the RBAC configuration files for the Buildkite agent:
+- `buildkite-clusterrole.yaml`: This file defines a ClusterRole with the necessary permissions for the Buildkite agent.
+- `buildkite-clusterrolebinding.yaml`: This file creates a ClusterRoleBinding to bind the ClusterRole to the Buildkite agent's ServiceAccount.
+- `buildkite-serviceaccount.yaml`: This file creates the ServiceAccount for the Buildkite agent.
+
 - `hello-world-app/`: This is the root directory for your "Hello World" application.
 - `.buildkite/`: This directory contains the Buildkite pipeline configuration.
   - `pipeline.yml`: This file defines the steps in your CI/CD pipeline, such as building the Docker image, pushing it to a registry, and deploying it to Kubernetes.
