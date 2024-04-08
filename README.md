@@ -20,17 +20,17 @@ k8s-buildkite
     ├── Dockerfile
     └── main.go
 ```
-The buildkite-agent directory contains the RBAC configuration files for the Buildkite agent:
-- `buildkite-clusterrole.yaml`: This file defines a ClusterRole with the necessary permissions for the Buildkite agent.
-- `buildkite-clusterrolebinding.yaml`: This file creates a ClusterRoleBinding to bind the ClusterRole to the Buildkite agent's ServiceAccount.
-- `buildkite-serviceaccount.yaml`: This file creates the ServiceAccount for the Buildkite agent.
+The `buildkite-agent/rbac` directory contains the RBAC configuration files for the Buildkite agent:
+- `0-clusterrole.yaml`: This file defines a ClusterRole with the necessary permissions for the Buildkite agent.
+- `1-clusterrolebinding.yaml`: This file creates a ClusterRoleBinding to bind the ClusterRole to the Buildkite agent's ServiceAccount.
+- `2-serviceaccount.yaml`: This file creates the ServiceAccount for the Buildkite agent.
 
-- `hello-world-app/`: This is the root directory for your "Hello World" application.
+- `example-app/`: This is the root directory for your "Hello World" application.
 - `.buildkite/`: This directory contains the Buildkite pipeline configuration.
   - `pipeline.yml`: This file defines the steps in your CI/CD pipeline, such as building the Docker image, pushing it to a registry, and deploying it to Kubernetes.
 - `Dockerfile`: This file contains the instructions for building the Docker image for your Go application.
-- `deployment.yaml`: This Kubernetes manifest file defines the deployment for your "Hello World" application, specifying the number of replicas, container image, and other configurations.
-- `service.yaml`: This Kubernetes manifest file defines a service to expose your "Hello World" application deployment to other pods or external traffic.
+- `example-app/1-deployment.yaml`: This Kubernetes manifest file defines the deployment for your "Hello World" application, specifying the number of replicas, container image, and other configurations.
+- `example-app/0-service.yaml`: This Kubernetes manifest file defines a service to expose your "Hello World" application deployment to other pods or external traffic.
 - `main.go`: This is the source code file for your simple "Hello World" Go application.
 
 
