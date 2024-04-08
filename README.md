@@ -8,11 +8,12 @@ k8s-buildkite
 ├── buildkite-agent
 │   ├── deploy
 │   │   ├── 0-deployment.yaml
-│   │   └── 1-ingress.yaml
+│   │   ├── 1-service.yaml
+│   │   └── 2-ingress.yaml
 │   └── rbac
 │       ├── 0-clusterrole.yaml
 │       ├── 1-clusterrolebinding.yaml
-│       └── 2-buildkite-serviceaccount.yaml
+│       └── 2-serviceaccount.yaml
 └── example-app
     ├── 0-service.yaml
     ├── 1-deployment.yaml
