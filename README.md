@@ -61,12 +61,12 @@ metadata:
 
 Apply the ServiceAccount:
 ```
-kubectl apply -f buildkite-serviceaccount.yaml -n buildkite
+kubectl apply -f 2-serviceaccount.yaml -n buildkite
 ```
 
 Next, create a ClusterRole that grants the necessary permissions for the Buildkite agent:
 ```
-# buildkite clusterrole.yaml
+# buildkite 0-clusterrole.yaml
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRole
 metadata:
@@ -77,9 +77,14 @@ rules:
   verbs: ["*"]
 ```
 
+Apply the ClusterRole:
+```
+kubectl apply -f 2-clusterrole.yaml -n buildkite
+```
+
 Finally, create a ClusterRoleBinding to bind the ClusterRole to the ServiceAccount:
 ```
-# buildkite clusterrolebinding.yaml
+# buildkite 1-clusterrolebinding.yaml
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRoleBinding
 metadata:
@@ -96,7 +101,7 @@ roleRef:
 
 Apply the ClusterRoleBinding:
 ```
-kubectl apply -f buildkite-clusterrolebinding.yaml
+kubectl apply -f 1-clusterrolebinding.yaml
 ```
 
 ## Step 4: Set up Buildkite Agent
@@ -184,10 +189,10 @@ Before deploying the Buildkite agent, you need to create the "kubernetes" agent-
 
 Apply the deployment and service:
 ```
-kubectl apply -f buildkite-agent-deployment.yaml -n buildkite
+kubectl apply -f 0-deployment.yaml -n buildkite
 ```
 
-## Step 5: Create a Horizontal Pod Autoscaler (HPA)
+## [COMING SOON: Skip for now] Step 5: Create a Horizontal Pod Autoscaler (HPA)
 
 If you anticipate varying workloads or want to automatically scale the number of agent pods based on resource utilization, implementing an HPA is a good idea.
 
@@ -328,4 +333,7 @@ Post-Deploy Successful Connection Logs:
 │ 2024-04-08 17:38:07 INFO   buildkite-agent-687bb4f685-kqx7b-1 Waiting for work...
 ```
 
+## Create a pipeline and run a job
+
+Your agent should now be connected to the "kubernetes" queue in Buildkite. Feel free to start making pipelines and building until your hearts content. I will be updating this repo with HPA mechanisms as well as a simple docker build/deploy pipeline in the future. Feel free to checkout Buildkites [Getting Started](https://buildkite.com/docs/tutorials/getting-started) guide to gain more familiarity with the tool. Thanks for reading!
 
