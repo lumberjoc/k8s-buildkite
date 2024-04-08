@@ -328,5 +328,5 @@ Post-Deploy Successful Connection Logs:
 
 ## Create a pipeline and run a job
 
-Your agent should now be connected to the "kubernetes" queue in Buildkite. Feel free to start making pipelines and building until your hearts content. I will be updating this repo with HPA mechanisms as well as a simple docker build/deploy pipeline in the future. Feel free to checkout Buildkites [Getting Started](https://buildkite.com/docs/tutorials/getting-started) guide to gain more familiarity with the tool. Thanks for reading!
+Your agent should now be connected to the "kubernetes" queue in Buildkite. Feel free to start making pipelines and building until your hearts content. I will be updating this repo with HPA mechanisms as well as a simple docker build/deploy pipeline in the future. Checkout Buildkite's [Getting Started](https://buildkite.com/docs/tutorials/getting-started) and [Create Your Own Pipeline](https://buildkite.com/docs/pipelines/create-your-own) guides to gain more familiarity with the tool. Thanks for reading!
 
