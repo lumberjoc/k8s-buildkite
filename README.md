@@ -135,11 +135,6 @@ spec:
             secretKeyRef:
               name: buildkite-agent-token
               key: token
-        - name: DOCKER_HUB_ACCESS_TOKEN
-          valueFrom:
-            secretKeyRef:
-              name: dockerhub-credentials
-              key: access-token
         - name: BUILDKITE_UNCLAIM_CONTAINERS_VIA_API
           value: "true"
         - name: BUILDKITE_AGENT_META_DATA_CPU_LIMIT
@@ -177,14 +172,6 @@ Before applying, you'll need to create a Kubernetes secret for the Buildkite age
 kubectl create secret generic buildkite-agent-token --from-literal=token=YOUR_BUILDKITE_AGENT_TOKEN -n buildkite
 ```
 Replace YOUR_BUILDKITE_AGENT_TOKEN with the actual token from your Buildkite account.
-
-[SKIP START] 
-2) Dockerhub-Token
-```
-kubectl create secret generic dockerhub-credentials --from-literal=access-token=YOUR_DOCKERHUB_ACCESS_TOKEN -n buildkite
-```
-Replace YOUR_DOCKERHUB_ACCESS_TOKEN with the actual token from your Buildkite account.
-[SKIP END]
 
 Before deploying the Buildkite agent, you need to create the "kubernetes" agent-queue in your Buildkite account. This can be done through the Buildkite web interface or using the Buildkite CLI. If you don't do this your agent will not connect. 
 
