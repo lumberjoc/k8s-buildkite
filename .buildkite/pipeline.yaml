@@ -1,19 +1,23 @@
 # pipeline.yml
 steps:
+  - label: "Checkout Code"
+    commands:
+      - git clone --depth=1 https://github.com/lumberjoc/k8s-buildkite.git .
+
   - label: "Authenticate with DockerHub"
     commands:
-      - docker login -u lumberjoc -p ${DOCKER_HUB_ACCESS_TOKEN}
+      - docker login -u YOUR_DOCKERHUB_USERNAME -p ${DOCKER_HUB_ACCESS_TOKEN}
 
   - label: "Build and Push Docker Image"
     commands:
-      - docker build -t lumberjoc/hello-world:$BUILDKITE_BUILD_NUMBER .
-      - docker push lumberjoc/hello-world:$BUILDKITE_BUILD_NUMBER
+      - docker build -t YOUR_DOCKERHUB_USERNAME/hello-world:$BUILDKITE_BUILD_NUMBER .
+      - docker push YOUR_DOCKERHUB_USERNAME/hello-world:$BUILDKITE_BUILD_NUMBER
 
   - wait
 
   - label: "Deploy to Kubernetes"
     commands:
-      - kubectl set image deployment/hello-world hello-world=lumberjoc/hello-world:$BUILDKITE_BUILD_NUMBER -n hello-world
+      - kubectl set image deployment/hello-world hello-world=YOUR_DOCKERHUB_USERNAME/hello-world:$BUILDKITE_BUILD_NUMBER -n hello-world
     agents:
       queue: "kubernetes"
 
