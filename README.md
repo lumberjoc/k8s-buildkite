@@ -135,6 +135,11 @@ spec:
             secretKeyRef:
               name: buildkite-agent-token
               key: token
+        - name: DOCKER_HUB_ACCESS_TOKEN
+          valueFrom:
+            secretKeyRef:
+              name: dockerhub-credentials
+              key: access-token
         - name: BUILDKITE_UNCLAIM_CONTAINERS_VIA_API
           value: "true"
         - name: BUILDKITE_AGENT_META_DATA_CPU_LIMIT
@@ -149,7 +154,10 @@ spec:
           valueFrom:
             fieldRef:
               fieldPath: metadata.name
----
+```
+
+```
+#buildkite-service.yaml
 apiVersion: v1
 kind: Service
 metadata:
@@ -163,13 +171,26 @@ spec:
     targetPort: 8000
 ```
 
-You'll need to create a Kubernetes secret for the Buildkite agent token:
+You'll need to create a Kubernetes secret for the Buildkite agent token and your Dockerhub access token:
+1) Agent-Token
 ```
 kubectl create secret generic buildkite-agent-token --from-literal=token=YOUR_BUILDKITE_AGENT_TOKEN -n hello-world
 ```
 Replace YOUR_BUILDKITE_AGENT_TOKEN with the actual token from your Buildkite account.
 
-Before deploying the Buildkite agent, you need to create the "kubernetes" agent queue in your Buildkite account. This can be done through the Buildkite web interface or using the Buildkite CLI. If you don't do this your agent will not connect. 
+2) Dockerhub-Token
+```
+kubectl create secret generic dockerhub-credentials --from-literal=access-token=YOUR_DOCKERHUB_ACCESS_TOKEN -n hello-world
+```
+Replace YOUR_DOCKERHUB_ACCESS_TOKEN with the actual token from your Buildkite account.
+
+
+Before deploying the Buildkite agent, you need to create the "kubernetes" agent-queue in your Buildkite account. This can be done through the Buildkite web interface or using the Buildkite CLI. If you don't do this your agent will not connect. 
+
+Apply the deployment and service:
+```
+kubectl apply -f buildkite-agent-deployment.yaml -n hello-world
+```
 
 Post-Deploy Failed Connection Logs:
 ```
@@ -186,12 +207,6 @@ Post-Deploy Successful Connection Logs:
 │ 2024-04-08 17:38:07 INFO   You can press Ctrl-C to stop the agents                                                                                                      
 │ 2024-04-08 17:38:07 INFO   buildkite-agent-687bb4f685-kqx7b-1 Connecting to Buildkite...                                                                                
 │ 2024-04-08 17:38:07 INFO   buildkite-agent-687bb4f685-kqx7b-1 Waiting for work...
-```
-
-
-Apply the deployment and service:
-```
-kubectl apply -f buildkite-agent-deployment.yaml -n hello-world
 ```
 
 Step 5: Set up Ingress/Egress
