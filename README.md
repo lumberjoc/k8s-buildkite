@@ -5,20 +5,16 @@ How to guide for setting up a simple Buildkite pipeline on your Kubernetes clust
 ```
 k8s-buildkite
 ├── README.md
-├── buildkite-agent
-│   ├── deploy
-│   │   ├── 0-deployment.yaml
-│   │   ├── 1-service.yaml
-│   │   └── 2-ingress.yaml
-│   └── rbac
-│       ├── 0-clusterrole.yaml
-│       ├── 1-clusterrolebinding.yaml
-│       └── 2-serviceaccount.yaml
-└── hello-world-app
-    ├── 0-service.yaml
-    ├── 1-deployment.yaml
-    ├── Dockerfile
-    └── main.go
+└── buildkite-agent
+    ├── deploy
+    │   ├── 0-deployment.yaml
+    │   ├── 1-service.yaml
+    │   ├── 2-ingress.yaml
+    │   └── 3-hpa.yaml
+    └── rbac
+        ├── 0-clusterrole.yaml
+        ├── 1-clusterrolebinding.yaml
+        └── 2-serviceaccount.yaml
 ```
 The `buildkite-agent/rbac` directory contains the RBAC configuration files for the Buildkite agent:
 - `0-clusterrole.yaml`: This file defines a ClusterRole with the necessary permissions for the Buildkite agent.
