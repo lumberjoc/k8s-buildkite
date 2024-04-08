@@ -1,5 +1,5 @@
-# 3-hpa.yaml
-apiVersion: autoscaling/v2beta1
+# k8s-buildkite/buildkite-agent/deploy/3-hpa.yaml
+apiVersion: autoscaling/v2
 kind: HorizontalPodAutoscaler
 metadata:
   name: buildkite-agent-hpa
@@ -15,4 +15,6 @@ spec:
   - type: Resource
     resource:
       name: cpu
-      targetAverageUtilization: 50
+      target:
+        type: Utilization
+        averageUtilization: 50
