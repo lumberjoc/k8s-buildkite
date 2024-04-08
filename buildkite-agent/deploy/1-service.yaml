@@ -2,7 +2,7 @@ apiVersion: v1
 kind: Service
 metadata:
   name: buildkite-agent
-  namespace: hello-world
+  namespace: buildkite
 spec:
   selector:
     app: buildkite-agent

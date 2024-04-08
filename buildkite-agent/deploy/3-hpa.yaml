@@ -3,7 +3,7 @@ apiVersion: autoscaling/v2beta1
 kind: HorizontalPodAutoscaler
 metadata:
   name: buildkite-agent-hpa
-  namespace: hello-world
+  namespace: buildkite
 spec:
   scaleTargetRef:
     apiVersion: apps/v1

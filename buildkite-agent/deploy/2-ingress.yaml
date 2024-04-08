@@ -3,7 +3,7 @@ apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
   name: buildkite-agent-ingress
-  namespace: hello-world
+  namespace: buildkite
   annotations:
     kubernetes.io/ingress.class: "nginx"
 spec:
