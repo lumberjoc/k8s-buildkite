@@ -1,5 +1,7 @@
 # k8s-buildkite
-How to guide for setting up a simple Buildkite pipeline on your Kubernetes cluster. I went through a few different tutorials explaining how to setup Buildkite, but was unable to find an adequate tutorial on how to setup a pipeline on a Kubernetes cluster. As a result, I've created this straight forward tutorial on how to setup a simple pipeline. Hope you enjoy!
+How-To guide for setting up a Buildkite agent in your Kubernetes cluster. I went through a few different tutorials explaining how to setup Buildkite, but was unable to find a tutorial I liked on how to setup an agent on a Kubernetes cluster. As a result, I've created this straight forward tutorial on how to setup a Buildkite agent. 
+
+Disclaimer: This is not production ready, but it should be good exercise to get you familiarized with Buildkite, k8s networking, rbac, and scaling. Hope you enjoy!
 
 ## File & Directory Breakdown
 ```
