@@ -51,7 +51,7 @@ RBAC (Role-Based Access Control) is a crucial aspect of Kubernetes security. It 
 
 First, create a ServiceAccount for the Buildkite agent:
 ```
-# buildkite serviceaccount.yaml
+# buildkite 0-serviceaccount.yaml
 apiVersion: v1
 kind: ServiceAccount
 metadata:
@@ -61,12 +61,12 @@ metadata:
 
 Apply the ServiceAccount:
 ```
-kubectl apply -f 2-serviceaccount.yaml -n buildkite
+kubectl apply -f 0-serviceaccount.yaml -n buildkite
 ```
 
 Next, create a ClusterRole that grants the necessary permissions for the Buildkite agent:
 ```
-# buildkite 0-clusterrole.yaml
+# buildkite 1-clusterrole.yaml
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRole
 metadata:
@@ -79,12 +79,12 @@ rules:
 
 Apply the ClusterRole:
 ```
-kubectl apply -f 2-clusterrole.yaml -n buildkite
+kubectl apply -f 1-clusterrole.yaml -n buildkite
 ```
 
 Finally, create a ClusterRoleBinding to bind the ClusterRole to the ServiceAccount:
 ```
-# buildkite 1-clusterrolebinding.yaml
+# buildkite 2-clusterrolebinding.yaml
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRoleBinding
 metadata:
@@ -101,13 +101,13 @@ roleRef:
 
 Apply the ClusterRoleBinding:
 ```
-kubectl apply -f 1-clusterrolebinding.yaml
+kubectl apply -f 2-clusterrolebinding.yaml
 ```
 
 ## Step 4: Set up Buildkite Agent
 
-We'll be using Buildkite's agent to run our pipelines. You can sign up for a Buildkite account and follow their instructions to set up the agent.
-Once you have the Buildkite agent configured, you'll need to create a Kubernetes deployment and service for it (don't apply immediately after creation):
+We'll be using Buildkite's agent to run our pipelines. You can sign up for a Buildkite account and follow their instructions to set up the agent token.
+Once you have the Buildkite agent token, you'll need to create a Kubernetes deployment that uses the agent-token and a service (don't apply immediately after creating files):
 ```
 # buildkite-agent-deployment.yaml
 apiVersion: apps/v1
@@ -178,7 +178,7 @@ kubectl create secret generic buildkite-agent-token --from-literal=token=YOUR_BU
 ```
 Replace YOUR_BUILDKITE_AGENT_TOKEN with the actual token from your Buildkite account.
 
-2) Dockerhub-Token
+2) [SKIP] Dockerhub-Token
 ```
 kubectl create secret generic dockerhub-credentials --from-literal=access-token=YOUR_DOCKERHUB_ACCESS_TOKEN -n buildkite
 ```
@@ -187,9 +187,14 @@ Replace YOUR_DOCKERHUB_ACCESS_TOKEN with the actual token from your Buildkite ac
 
 Before deploying the Buildkite agent, you need to create the "kubernetes" agent-queue in your Buildkite account. This can be done through the Buildkite web interface or using the Buildkite CLI. If you don't do this your agent will not connect. 
 
-Apply the deployment and service:
+Apply the deployment:
 ```
 kubectl apply -f 0-deployment.yaml -n buildkite
+```
+
+Apply the service:
+```
+kubectl apply -f 1-service.yaml -n buildkite
 ```
 
 ## [COMING SOON: Skip for now] Step 5: Create a Horizontal Pod Autoscaler (HPA)
@@ -313,7 +318,7 @@ spec:
 
 Apply the Ingress:
 ```
-kubectl apply -f buildkite-agent-ingress.yaml -n buildkite
+kubectl apply -f 2-ingress.yaml -n buildkite
 ```
 
 Post-Deploy Failed Connection Logs:
