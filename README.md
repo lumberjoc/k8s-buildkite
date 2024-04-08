@@ -192,23 +192,6 @@ Apply the deployment and service:
 kubectl apply -f buildkite-agent-deployment.yaml -n hello-world
 ```
 
-Post-Deploy Failed Connection Logs:
-```
-| 2024-04-08 17:36:46 INFO   Registering agent with Buildkite...
-│ 2024-04-08 17:36:46 WARN   Failed to find unique machine-id: machineid: machineid: open /etc/machine-id: no such file or directory
-│ 2024-04-08 17:36:46 WARN   POST https://agent.buildkite.com/v3/register: 400 Bad Request: Queue is required when registering agents to a cluster (Attempt 1/30 Retrying
-```
-
-Post-Deploy Successful Connection Logs:
-```
-| 2024-04-08 17:36:46 INFO   Registering agent with Buildkite...
-| 2024-04-08 17:38:07 INFO   Successfully registered agent "buildkite-agent-687bb4f685-kqx7b-1" with tags [queue=kubernetes]                                             
-│ 2024-04-08 17:38:07 INFO   Starting 1 Agent(s)                                                                                                                         
-│ 2024-04-08 17:38:07 INFO   You can press Ctrl-C to stop the agents                                                                                                      
-│ 2024-04-08 17:38:07 INFO   buildkite-agent-687bb4f685-kqx7b-1 Connecting to Buildkite...                                                                                
-│ 2024-04-08 17:38:07 INFO   buildkite-agent-687bb4f685-kqx7b-1 Waiting for work...
-```
-
 Step 5: Set up Ingress/Egress
 
 Since the Buildkite agent needs to communicate with the Buildkite service, we need to configure networking appropriately. In this case, we'll use an Ingress resource to expose the Buildkite agent service to the internet:
@@ -238,6 +221,24 @@ Apply the Ingress:
 ```
 kubectl apply -f buildkite-agent-ingress.yaml -n hello-world
 ```
+
+Post-Deploy Failed Connection Logs:
+```
+| 2024-04-08 17:36:46 INFO   Registering agent with Buildkite...
+│ 2024-04-08 17:36:46 WARN   Failed to find unique machine-id: machineid: machineid: open /etc/machine-id: no such file or directory
+│ 2024-04-08 17:36:46 WARN   POST https://agent.buildkite.com/v3/register: 400 Bad Request: Queue is required when registering agents to a cluster (Attempt 1/30 Retrying
+```
+
+Post-Deploy Successful Connection Logs:
+```
+| 2024-04-08 17:36:46 INFO   Registering agent with Buildkite...
+| 2024-04-08 17:38:07 INFO   Successfully registered agent "buildkite-agent-687bb4f685-kqx7b-1" with tags [queue=kubernetes]                                             
+│ 2024-04-08 17:38:07 INFO   Starting 1 Agent(s)                                                                                                                         
+│ 2024-04-08 17:38:07 INFO   You can press Ctrl-C to stop the agents                                                                                                      
+│ 2024-04-08 17:38:07 INFO   buildkite-agent-687bb4f685-kqx7b-1 Connecting to Buildkite...                                                                                
+│ 2024-04-08 17:38:07 INFO   buildkite-agent-687bb4f685-kqx7b-1 Waiting for work...
+```
+
 
 ## Step 6: Set up "Hello World" Application
 
