@@ -43,15 +43,3 @@ spec:
           valueFrom:
             fieldRef:
               fieldPath: metadata.name
----
-apiVersion: v1
-kind: Service
-metadata:
-  name: buildkite-agent
-  namespace: hello-world
-spec:
-  selector:
-    app: buildkite-agent
-  ports:
-  - port: 8000
-    targetPort: 8000
