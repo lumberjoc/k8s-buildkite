@@ -166,14 +166,14 @@ Replace YOUR_BUILDKITE_AGENT_TOKEN with the actual token from your Buildkite acc
 
 Before deploying the Buildkite agent, you need to create the "kubernetes" agent queue in your Buildkite account. This can be done through the Buildkite web interface or using the Buildkite CLI. If you don't do this your agent will not connect. 
 
-Failed Connection Log:
+Post-Deploy Failed Connection Logs:
 ```
 | 2024-04-08 17:36:46 INFO   Registering agent with Buildkite...
 │ 2024-04-08 17:36:46 WARN   Failed to find unique machine-id: machineid: machineid: open /etc/machine-id: no such file or directory
 │ 2024-04-08 17:36:46 WARN   POST https://agent.buildkite.com/v3/register: 400 Bad Request: Queue is required when registering agents to a cluster (Attempt 1/30 Retrying
 ```
 
-Successful Connection Log:
+Post-Deploy Successful Connection Logs:
 ```
 | 2024-04-08 17:36:46 INFO   Registering agent with Buildkite...
 | 2024-04-08 17:38:07 INFO   Successfully registered agent "buildkite-agent-687bb4f685-kqx7b-1" with tags [queue=kubernetes]                                             
